@@ -3,7 +3,7 @@ name: video-creator
 description: "Creates videos from scratch using ffmpeg, programming, and assets. Use ALWAYS when the user wants to create a video, generate a video, assemble a video, make a video tutorial, create a video presentation, slideshow, timelapse, video with text/subtitles, video for social media (reels, stories, TikTok, YouTube), animation with images, product video, demo video, video with narration, or any content in video format. Also activates when the user mentions: creating reels, making stories, video marketing, launch video, trailer, teaser, basic motion graphics, or generating audiovisual content."
 metadata:
   author: EmersonBraun
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Video Creator — Video Creation via Code
@@ -90,6 +90,19 @@ ffmpeg -i video.mp4 -i music.mp3 \
 - **yt-dlp** — Download YouTube videos (for reference/remix)
 - **sox** — Audio processing
 - **whisper** — Audio transcription for subtitles
+
+## Remotion (React-based Video)
+
+For component-based, data-driven, or animation-heavy videos in a React/TypeScript project, use the **remotion** skill instead of this one.
+
+| Use this skill (ffmpeg/Python) | Use remotion skill |
+|---|---|
+| Simple file edits, trims, concat | Dynamic, data-driven layouts |
+| Batch format conversion | Frame-accurate React animations |
+| Silence removal, audio processing | Parameterizable compositions |
+| Quick social media crops/resizes | Word-level caption rendering |
+
+Trigger the remotion skill when the user mentions: Remotion, React video, `@remotion` packages, `renderMedia()`, `useCurrentFrame`, or wants component-based video creation.
 
 ## Consult Reference
 

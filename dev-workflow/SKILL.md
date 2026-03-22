@@ -10,7 +10,7 @@ description: >
   this skill decides what comes next and runs autonomously via Claude Code.
 metadata:
   author: EmersonBraun
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Dev Workflow Orchestrator
@@ -72,6 +72,28 @@ Invoke skill `write-a-prd` to create the PRD through user interview and codebase
 Wait for the PRD to be submitted as a GitHub issue before advancing.
 
 **Exit condition:** PRD issue created on GitHub.
+
+---
+
+## Phase 1.5 — Clarify
+
+**Trigger:** PRD exists but contains ambiguities before issue breakdown begins.
+
+If the PRD contains ambiguities, run a structured clarification pass:
+identify up to 5 critical unknowns, resolve each through targeted Q&A before
+proceeding to Phase 2.
+
+1. Scan the PRD for gaps: missing edge-case behaviour, undefined user roles, vague
+   success criteria, unstated constraints, or conflicting requirements.
+2. List each unknown as a numbered question (max 5). Prioritise questions that
+   affect scope, security, or core UX — skip cosmetic or low-stakes ambiguities.
+3. Ask all questions in a single message. Wait for answers before continuing.
+4. Update the PRD issue with the resolved answers and mark the clarification pass
+   complete as a comment.
+
+**Skip this phase** when the PRD is unambiguous or the user explicitly says to proceed.
+
+**Exit condition:** All critical unknowns resolved and documented on the PRD issue.
 
 ---
 
@@ -218,6 +240,21 @@ Part of #[parent-PRD-number]
 - All issues done -> close parent PRD issue with summary -> **workflow complete**
 
 **Exit condition:** PR merged, issue closed, next phase identified.
+
+---
+
+## Reference Templates
+
+This skill has detailed reference templates. Consult `references/spec-templates.md`
+for structured templates for specs, plans, tasks, and checklists.
+
+| Template | Purpose | When to use |
+|----------|---------|-------------|
+| Feature Specification | Full spec with scenarios, FRs, entities, success criteria | Phase 1 PRD creation |
+| Implementation Plan | Phased plan with research, gates, MVP cut line | Phase 2 issue breakdown |
+| Task Breakdown | T-NNN task list with parallel markers and user story links | Phase 2 / Phase 3 prep |
+| Requirements Checklist | CHK-NNN quality gates for spec approval | Before Phase 2 begins |
+| Constitution (optional) | Project-level architectural principles | Phase 0 for greenfield projects |
 
 ---
 

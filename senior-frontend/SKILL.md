@@ -3,7 +3,7 @@ name: senior-frontend
 description: "The ultimate frontend design and development skill. Creates production-ready, pixel-perfect web interfaces with Next.js + Tailwind + shadcn/ui. Combines design thinking, UX best practices, accessibility, animation, and real design system patterns inspired by the best sites on the web. Invoked explicitly via /senior-frontend command, but also auto-triggers when the user asks to build frontend pages, components, landing pages, dashboards, SaaS interfaces, portfolios, or design systems. Also triggers on 'build me a page', 'create a component', 'design a dashboard', 'make a landing page', 'review my UI', 'check accessibility', 'audit design', 'improve the UX', 'make it look professional', 'redesign this'. Supersedes frontend-design and web-design-guidelines."
 metadata:
   author: EmersonBraun
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # UI/UX Pro Max — The Definitive Frontend Skill
@@ -356,6 +356,12 @@ These are the most common mistakes. If you catch yourself doing any of these, st
 - ❌ Auto-playing video/audio without user consent
 - ❌ Layouts that break at 375px (test iPhone SE!)
 - ❌ Generic "Lorem ipsum" in demos (use real-feeling content)
+
+---
+
+## Design Excellence Reference
+
+Consult `references/design-excellence.md` for anti-AI-slop patterns, OKLCH color system, motion rules, interaction states, and improvement modes.
 
 ---
 

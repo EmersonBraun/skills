@@ -11,6 +11,8 @@
 8. [Optimization](#optimization)
 9. [Effects](#effects)
 10. [Automation with Python](#python)
+11. [Silence Removal](#silence-removal)
+12. [Transcription with faster-whisper](#transcription)
 
 ---
 
@@ -310,4 +312,220 @@ def create_text_frame(text, size=(1080, 1920), bg_color="#1a1a2e", text_color="w
     y = (size[1] - (bbox[3] - bbox[1])) // 2
     draw.text((x, y), text, fill=text_color, font=font)
     return img
+```
+
+---
+
+## Silence Removal
+
+Automatically cut dead air from talking-head footage while preserving natural pauses.
+
+### Step 1 — Detect silences
+
+```bash
+# Outputs silence_start / silence_end timestamps to stderr
+ffmpeg -i input.mp4 -af silencedetect=noise=-30dB:d=0.5 -f null - 2>&1 | grep silence
+```
+
+Parameters:
+- `noise=-30dB` — audio level below which a region is considered silent (adjust to -40dB for quieter recordings)
+- `d=0.5` — minimum silence duration in seconds before a cut is triggered
+
+### Step 2 — Extract non-silence segments
+
+For each non-silence region `[segStart, segEnd]`, extract to a transport stream (`.ts`) file.
+Add `naturalPause / 2` (e.g. 0.15s) padding on each edge to preserve natural cadence:
+
+```bash
+# Example: keep segment from 0.000s to 4.350s (0.15s tail of preceding silence)
+ffmpeg -y -i input.mp4 \
+  -ss 0.000 -to 4.350 \
+  -c copy -avoid_negative_ts make_zero \
+  _seg_0000.ts
+
+ffmpeg -y -i input.mp4 \
+  -ss 5.650 -to 12.800 \
+  -c copy -avoid_negative_ts make_zero \
+  _seg_0001.ts
+```
+
+Use `.ts` (MPEG-TS) not `.mp4` for intermediate segments — it handles PTS discontinuities cleanly during concat.
+
+### Step 3 — Reassemble with concat demuxer
+
+```bash
+# Write concat list
+printf "file '_seg_0000.ts'\nfile '_seg_0001.ts'\n" > _concat_list.txt
+
+# Reassemble (stream copy = no re-encoding, fast)
+ffmpeg -y -f concat -safe 0 -i _concat_list.txt -c copy output.mp4
+
+# Clean up temp files
+rm _seg_*.ts _concat_list.txt
+```
+
+### All-in-one bash script skeleton
+
+```bash
+#!/usr/bin/env bash
+INPUT="$1"
+OUTPUT="${2:-edited-footage.mp4}"
+THRESHOLD="-30"
+MIN_SILENCE="0.5"
+HALF_PAUSE="0.15"
+
+# Detect silences
+SILENCE_LOG=$(ffmpeg -i "$INPUT" -af "silencedetect=noise=${THRESHOLD}dB:d=${MIN_SILENCE}" -f null - 2>&1)
+
+# Get total duration
+DURATION=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$INPUT")
+
+# Parse and build segments (Python handles the math cleanly)
+python3 - "$INPUT" "$OUTPUT" "$DURATION" "$HALF_PAUSE" <<'EOF'
+import sys, re, subprocess, os
+
+input_path, output_path, total_dur, half_pause = sys.argv[1], sys.argv[2], float(sys.argv[3]), float(sys.argv[4])
+log = subprocess.run(
+    ["ffmpeg", "-i", input_path, "-af", "silencedetect=noise=-30dB:d=0.5", "-f", "null", "-"],
+    capture_output=True, text=True
+).stderr
+
+starts = [float(m) for m in re.findall(r"silence_start:\s*([\d.]+)", log)]
+ends   = [float(m) for m in re.findall(r"silence_end:\s*([\d.]+)",   log)]
+
+segments, cursor = [], 0.0
+for s, e in zip(starts, ends):
+    seg_end = s + half_pause
+    if seg_end > cursor:
+        segments.append((cursor, min(seg_end, total_dur)))
+    cursor = max(cursor, e - half_pause)
+if cursor < total_dur:
+    segments.append((cursor, total_dur))
+
+temp_files, concat_lines = [], []
+for i, (start, end) in enumerate(segments):
+    tmp = f"_seg_{i:04d}.ts"
+    temp_files.append(tmp)
+    subprocess.run(["ffmpeg", "-y", "-i", input_path, "-ss", f"{start:.3f}", "-to", f"{end:.3f}",
+                    "-c", "copy", "-avoid_negative_ts", "make_zero", tmp], check=True)
+    concat_lines.append(f"file '{tmp}'")
+
+with open("_concat_list.txt", "w") as f:
+    f.write("\n".join(concat_lines))
+
+subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", "_concat_list.txt", "-c", "copy", output_path], check=True)
+
+for f in temp_files + ["_concat_list.txt"]:
+    os.unlink(f)
+print(f"Done: {output_path}")
+EOF
+```
+
+---
+
+## Transcription with faster-whisper
+
+Word-level transcription with timestamps — useful for subtitle generation, silence detection, and transcript-anchored overlay placement.
+
+### Installation
+
+```bash
+pip install faster-whisper
+```
+
+### Basic usage (CLI wrapper)
+
+```bash
+# Transcribe to JSON with word-level timestamps
+python3 - audio.wav > transcription.json <<'EOF'
+import json, sys
+from faster_whisper import WhisperModel
+
+audio_path = sys.argv[1]
+model = WhisperModel("medium", device="cpu", compute_type="int8")
+segments, info = model.transcribe(
+    audio_path,
+    beam_size=5,
+    word_timestamps=True,
+    vad_filter=True,        # automatically skips non-speech
+)
+
+result = {"language": info.language, "segments": []}
+for seg in segments:
+    words = [
+        {"word": w.word.strip(), "start": round(w.start, 3), "end": round(w.end, 3)}
+        for w in seg.words
+    ]
+    result["segments"].append({
+        "id": seg.id,
+        "start": round(seg.start, 3),
+        "end": round(seg.end, 3),
+        "text": seg.text.strip(),
+        "words": words,
+    })
+
+print(json.dumps(result, indent=2))
+EOF
+```
+
+### Output structure
+
+```json
+{
+  "language": "en",
+  "segments": [
+    {
+      "id": 0,
+      "start": 0.0,
+      "end": 3.5,
+      "text": "Hello and welcome to this tutorial",
+      "words": [
+        { "word": "Hello",   "start": 0.0,  "end": 0.4 },
+        { "word": "and",     "start": 0.45, "end": 0.6 },
+        { "word": "welcome", "start": 0.65, "end": 1.1 }
+      ]
+    }
+  ]
+}
+```
+
+### Model selection
+
+| Model | Speed | Accuracy | Best for |
+|---|---|---|---|
+| `tiny` | Fastest | Low | Quick drafts |
+| `base` | Fast | Medium | Social clips |
+| `medium` | Moderate | High | Production (default) |
+| `large-v3` | Slow | Highest | Long-form accuracy |
+
+### Extract audio from video before transcribing
+
+```bash
+# Extract 16kHz mono WAV (optimal for Whisper)
+ffmpeg -i video.mp4 -ar 16000 -ac 1 -vn audio.wav
+```
+
+### Generate SRT from transcription JSON
+
+```python
+import json
+
+def ms_to_srt(ms):
+    h, r = divmod(ms, 3600000)
+    m, r = divmod(r, 60000)
+    s, ms = divmod(r, 1000)
+    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+with open("transcription.json") as f:
+    data = json.load(f)
+
+lines = []
+for i, seg in enumerate(data["segments"], 1):
+    lines.append(str(i))
+    lines.append(f"{ms_to_srt(int(seg['start']*1000))} --> {ms_to_srt(int(seg['end']*1000))}")
+    lines.append(seg["text"])
+    lines.append("")
+
+with open("subtitles.srt", "w") as f:
+    f.write("\n".join(lines))
 ```

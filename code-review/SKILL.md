@@ -3,7 +3,7 @@ name: code-review
 description: "Multi-agent code review for pull requests. Checks for bugs, CLAUDE.md compliance, git history context, and previous PR comments. Uses confidence scoring to filter false positives. Use when the user wants to review a PR, code review, check a pull request, or mentions 'review my PR', 'code review', 'check this PR'. Also triggers when dev-workflow reaches the code review phase."
 metadata:
   author: EmersonBraun
-  version: "1.0.0"
+  version: "1.1.0"
 allowed-tools: Bash(gh issue view:*) Bash(gh search:*) Bash(gh issue list:*) Bash(gh pr comment:*) Bash(gh pr diff:*) Bash(gh pr view:*) Bash(gh pr list:*)
 ---
 
@@ -114,3 +114,4 @@ These are NOT real issues:
 - Use `gh` for all GitHub interactions (not web fetch)
 - Make a todo list first to track progress
 - Cite and link every bug (if from CLAUDE.md, link the specific file)
+- Consult `references/review-patterns.md` for advanced review patterns including blast-radius analysis, structured output templates, and test coverage gap detection.
