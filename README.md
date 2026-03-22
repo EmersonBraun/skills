@@ -1,67 +1,32 @@
-# NoxSkills — Plugin de Skills para Claude Code
+# Skills
 
-Skills curadas para founders, frontend extremo e criacao/edicao de video.
+[Agent Skills](https://agentskills.io/) for founders, frontend engineering, dev workflow orchestration, QA, and video creation/editing.
 
-## Skills Incluidas
+Works with **Claude Code, Cursor, Copilot, OpenCode, Gemini CLI, Codex, Roo Code**, and [30+ other tools](https://agentskills.io/).
 
-| Skill | Comando | Descricao |
-|-------|---------|-----------|
-| **Founder** | `/nox-skills:founder` | Consultor estrategico para startups. Validacao de ideias, MVP, PMF, growth, fundraising, unit economics. |
-| **Frontend Extreme** | `/nox-skills:frontend-extreme` | Design engineering de nivel mundial. Next.js + Tailwind + shadcn/ui. Pixel-perfect, acessivel, animado. |
-| **Video Creator** | `/nox-skills:video-creator` | Cria videos do zero via ffmpeg/Python. Slideshows, reels, demos, motion graphics. |
-| **Video Editor** | `/nox-skills:video-editor` | Edita videos existentes. Corte, legendas, compressao, efeitos, batch processing. |
-
-## Instalacao
+## Install
 
 ```bash
-/plugin install https://github.com/EmersonBraun/nox-skills
+npx skills add EmersonBraun/skills
 ```
 
-## Uso
+Or install a single skill:
 
-Apos instalar, use os comandos diretamente:
-
-```
-/nox-skills:founder      → Consultor de startup
-/nox-skills:frontend-extreme  → Design engineering
-/nox-skills:video-creator     → Criar videos
-/nox-skills:video-editor      → Editar videos
+```bash
+npx skills add EmersonBraun/skills/founder
 ```
 
-As skills tambem ativam automaticamente por contexto (ex: mencionar "startup", "MVP", "ffmpeg", "criar video", etc).
+## Available Skills
 
-## Estrutura
+| Skill | Description |
+|-------|-------------|
+| **[founder](./founder)** | Strategic consultant for startup founders. Idea validation, MVP, PMF, growth, fundraising, unit economics, and go-to-market strategy. |
+| **[frontend-extreme](./frontend-extreme)** | World-class design engineering. Pixel-perfect, accessible, animated interfaces with Next.js + Tailwind + shadcn/ui. |
+| **[dev-workflow](./dev-workflow)** | End-to-end development lifecycle orchestrator. Coordinates PRD → Issues → QA → Development → Testing → Code Review → PR. |
+| **[senior-qa](./senior-qa)** | Comprehensive QA and testing strategies. Test suite generation, coverage analysis, E2E scaffolding with Playwright. |
+| **[video-creator](./video-creator)** | Create videos from scratch using ffmpeg and Python. Slideshows, reels, demos, tutorials, motion graphics. |
+| **[video-editor](./video-editor)** | Edit existing videos with ffmpeg. Trim, concat, subtitles, compression, color grading, batch processing. |
 
-```
-nox-skills/
-├── .claude-plugin/
-│   └── plugin.json
-├── skills/
-│   ├── founder/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       ├── tools-and-stack.md
-│   │       ├── fundraising-guide.md
-│   │       ├── growth-and-marketing.md
-│   │       └── learning-resources.md
-│   ├── frontend-extreme/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       ├── animation-recipes.md
-│   │       ├── color-palettes.md
-│   │       ├── component-patterns.md
-│   │       ├── inspiration-patterns.md
-│   │       ├── layout-patterns.md
-│   │       └── templates.md
-│   ├── video-creator/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       └── ffmpeg-recipes.md
-│   └── video-editor/
-│       └── SKILL.md
-└── README.md
-```
-
-## Licenca
+## License
 
 MIT

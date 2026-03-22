@@ -1,9 +1,0 @@
-{
-  "name": "nox-skills",
-  "description": "Skills curadas para founders, frontend extremo, e criacao/edicao de video. Inclui consultor estrategico de startup, design system avancado, e workflows de video com ffmpeg.",
-  "version": "1.0.0",
-  "author": {
-    "name": "Emerson Braun",
-    "url": "https://github.com/EmersonBraun"
-  }
-}

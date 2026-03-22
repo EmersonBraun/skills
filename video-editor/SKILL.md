@@ -1,192 +1,192 @@
 ---
 name: video-editor
-description: "Edita videos existentes usando ffmpeg e Python. Use SEMPRE que o usuario quiser editar video, cortar video, juntar videos, adicionar legenda, adicionar musica, remover audio, redimensionar video, converter formato, comprimir video, extrair audio, extrair frames, adicionar watermark, fazer timelapse, slow motion, speed up, reverso, adicionar transicao, crop, rotacionar, ajustar brilho/contraste, color grading, gerar GIF, gerar thumbnail, ou qualquer manipulacao de arquivo de video existente. Tambem ativa quando o usuario menciona: ffmpeg, moviepy, cortar trecho, juntar clips, legendar video, ou processar video."
+description: "Edits existing videos using ffmpeg and Python. Use ALWAYS when the user wants to edit a video, cut a video, join videos, add subtitles, add music, remove audio, resize a video, convert format, compress a video, extract audio, extract frames, add a watermark, make a timelapse, slow motion, speed up, reverse, add a transition, crop, rotate, adjust brightness/contrast, color grading, generate a GIF, generate a thumbnail, or any manipulation of an existing video file. Also activates when the user mentions: ffmpeg, moviepy, cutting a clip, joining clips, captioning a video, or processing a video."
 ---
 
-# Video Editor — Edicao de Videos via Codigo
+# Video Editor — Video Editing via Code
 
-Voce e um especialista em edicao e manipulacao de video usando ffmpeg e Python. Voce recebe videos existentes e aplica transformacoes, cortes, composicoes e efeitos.
+You are an expert in video editing and manipulation using ffmpeg and Python. You receive existing videos and apply transformations, cuts, compositions, and effects.
 
-## Principios
+## Principles
 
-1. **Entenda antes de editar** — Analise o video de entrada (resolucao, codec, duracao, fps, audio) antes de qualquer operacao
-2. **Preservar qualidade** — Use `-c copy` quando possivel (sem re-encoding). Re-encode so quando necessario (filtros, resize, composicao)
-3. **Non-destructive** — Nunca sobrescreva o original. Sempre gere novo arquivo
-4. **Batch-friendly** — Scripts devem funcionar para 1 ou 100 videos
+1. **Understand before editing** — Analyze the input video (resolution, codec, duration, fps, audio) before any operation
+2. **Preserve quality** — Use `-c copy` whenever possible (no re-encoding). Re-encode only when necessary (filters, resize, compositing)
+3. **Non-destructive** — Never overwrite the original. Always generate a new file
+4. **Batch-friendly** — Scripts should work for 1 or 100 videos
 
-## Primeiro Passo: Analisar o Video
+## First Step: Analyze the Video
 
-Sempre comece analisando o video de entrada:
+Always start by analyzing the input video:
 
 ```bash
-# Info completa do video
+# Full video info
 ffprobe -v quiet -print_format json -show_format -show_streams input.mp4
 
-# Resumo rapido
+# Quick summary
 ffprobe -v quiet -show_entries format=duration,size,bit_rate:stream=codec_name,width,height,r_frame_rate,channels -of compact input.mp4
 ```
 
-Informacoes essenciais:
-- **Resolucao**: width x height
+Essential information:
+- **Resolution**: width x height
 - **Codec**: h264, h265, vp9, av1
-- **FPS**: frames por segundo
-- **Duracao**: em segundos
-- **Bitrate**: qualidade
+- **FPS**: frames per second
+- **Duration**: in seconds
+- **Bitrate**: quality
 - **Audio**: codec, sample rate, channels
 
-## Operacoes Comuns
+## Common Operations
 
-### Corte (Trim)
+### Trim
 ```bash
-# Sem re-encoding (rapido, preciso ao keyframe)
+# Without re-encoding (fast, keyframe-accurate)
 ffmpeg -ss 00:01:00 -to 00:02:30 -i input.mp4 -c copy output.mp4
 
-# Com re-encoding (preciso ao frame)
+# With re-encoding (frame-accurate)
 ffmpeg -i input.mp4 -ss 00:01:00 -to 00:02:30 -c:v libx264 -c:a aac output.mp4
 ```
 
-### Concatenar (Juntar Videos)
+### Concatenate (Join Videos)
 ```bash
-# Criar lista
+# Create list
 echo "file 'v1.mp4'" > list.txt
 echo "file 'v2.mp4'" >> list.txt
 echo "file 'v3.mp4'" >> list.txt
 
-# Concatenar (mesma resolucao/codec)
+# Concatenate (same resolution/codec)
 ffmpeg -f concat -safe 0 -i list.txt -c copy output.mp4
 
-# Concatenar (resolucoes diferentes)
+# Concatenate (different resolutions)
 ffmpeg -i v1.mp4 -i v2.mp4 \
   -filter_complex "[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080[v0];[1:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080[v1];[v0][v1]concat=n=2:v=1:a=0" \
   output.mp4
 ```
 
-### Redimensionar
+### Resize
 ```bash
-# Resolucao especifica
+# Specific resolution
 ffmpeg -i input.mp4 -vf "scale=1280:720" -c:a copy output.mp4
 
-# Manter aspect ratio (largura 1080, altura proporcional)
+# Maintain aspect ratio (width 1080, proportional height)
 ffmpeg -i input.mp4 -vf "scale=1080:-2" -c:a copy output.mp4
 
-# Fit em caixa sem distorcer
+# Fit in box without distorting
 ffmpeg -i input.mp4 -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black" output.mp4
 ```
 
-### Crop (Recortar Area)
+### Crop (Crop Area)
 ```bash
-# Recortar centro 1080x1080 de video 1920x1080
+# Crop center 1080x1080 from 1920x1080 video
 ffmpeg -i input.mp4 -vf "crop=1080:1080:(iw-1080)/2:(ih-1080)/2" output.mp4
 
-# Recortar com deteccao automatica de bordas pretas
+# Crop with automatic black border detection
 ffmpeg -i input.mp4 -vf "cropdetect" -f null - 2>&1 | tail -5
 ```
 
-### Rotacionar
+### Rotate
 ```bash
-# 90 graus horario
+# 90 degrees clockwise
 ffmpeg -i input.mp4 -vf "transpose=1" output.mp4
 
-# 90 graus anti-horario
+# 90 degrees counter-clockwise
 ffmpeg -i input.mp4 -vf "transpose=2" output.mp4
 
-# 180 graus
+# 180 degrees
 ffmpeg -i input.mp4 -vf "transpose=1,transpose=1" output.mp4
 ```
 
-### Conversao de Formato
+### Format Conversion
 ```bash
-# MP4 para WebM (VP9)
+# MP4 to WebM (VP9)
 ffmpeg -i input.mp4 -c:v libvpx-vp9 -crf 30 -c:a libopus output.webm
 
-# MOV para MP4
+# MOV to MP4
 ffmpeg -i input.mov -c:v libx264 -c:a aac -preset fast output.mp4
 
-# MP4 para GIF
+# MP4 to GIF
 ffmpeg -i input.mp4 -vf "fps=15,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" output.gif
 ```
 
-### Compressao
+### Compression
 ```bash
-# Boa qualidade, arquivo menor (CRF 23 = padrao, 28 = mais comprimido)
+# Good quality, smaller file (CRF 23 = default, 28 = more compressed)
 ffmpeg -i input.mp4 -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k output.mp4
 
-# Para WhatsApp (max 16MB)
-# Formula: target_bitrate = (16 * 8192 / duracao_segundos) - 128
+# For WhatsApp (max 16MB)
+# Formula: target_bitrate = (16 * 8192 / duration_seconds) - 128
 ffmpeg -i input.mp4 -c:v libx264 -b:v 3000k -maxrate 3500k -bufsize 7000k -c:a aac -b:a 128k -movflags +faststart output.mp4
 
-# 2-pass (melhor qualidade/tamanho)
+# 2-pass (best quality/size)
 ffmpeg -i input.mp4 -c:v libx264 -b:v 2000k -pass 1 -f null /dev/null
 ffmpeg -i input.mp4 -c:v libx264 -b:v 2000k -pass 2 -c:a aac output.mp4
 ```
 
-## Edicao de Audio
+## Audio Editing
 
-### Adicionar musica de fundo
+### Add background music
 ```bash
 ffmpeg -i video.mp4 -i music.mp3 \
   -filter_complex "[1:a]volume=0.2[bg];[0:a][bg]amix=inputs=2:duration=first[out]" \
   -map 0:v -map "[out]" -c:v copy -c:a aac output.mp4
 ```
 
-### Substituir audio completo
+### Replace entire audio
 ```bash
 ffmpeg -i video.mp4 -i new_audio.mp3 -c:v copy -map 0:v -map 1:a -shortest output.mp4
 ```
 
-### Remover audio
+### Remove audio
 ```bash
 ffmpeg -i video.mp4 -an -c:v copy silent.mp4
 ```
 
-### Extrair audio
+### Extract audio
 ```bash
 ffmpeg -i video.mp4 -vn -c:a libmp3lame -q:a 2 audio.mp3
 ```
 
-### Normalizar volume
+### Normalize volume
 ```bash
 ffmpeg -i video.mp4 -af "loudnorm=I=-14:LRA=11:TP=-1.5" -c:v copy output.mp4
 ```
 
-## Legendas e Texto
+## Subtitles and Text
 
-### Adicionar legendas SRT embutidas
+### Add embedded SRT subtitles
 ```bash
-# Soft subtitles (player mostra/esconde)
+# Soft subtitles (player shows/hides)
 ffmpeg -i video.mp4 -i subs.srt -c copy -c:s mov_text output.mp4
 
-# Hard subtitles (burned-in, sempre visiveis)
+# Hard subtitles (burned-in, always visible)
 ffmpeg -i video.mp4 -vf "subtitles=subs.srt:force_style='FontSize=24,PrimaryColour=&Hffffff,OutlineColour=&H000000,Outline=2,MarginV=40'" output.mp4
 ```
 
-### Gerar SRT com Whisper
+### Generate SRT with Whisper
 ```bash
 pip install openai-whisper
 whisper video.mp4 --model base --output_format srt --language pt
 ```
 
-### Texto sobreposto
+### Overlaid text
 ```bash
 ffmpeg -i video.mp4 \
-  -vf "drawtext=text='Titulo':fontcolor=white:fontsize=64:x=(w-text_w)/2:y=50:shadowcolor=black:shadowx=3:shadowy=3" \
+  -vf "drawtext=text='Title':fontcolor=white:fontsize=64:x=(w-text_w)/2:y=50:shadowcolor=black:shadowx=3:shadowy=3" \
   output.mp4
 ```
 
-## Efeitos e Ajustes
+## Effects and Adjustments
 
-### Velocidade
+### Speed
 ```bash
-# 2x rapido
+# 2x faster
 ffmpeg -i input.mp4 -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" fast.mp4
 
-# 0.5x lento
+# 0.5x slower
 ffmpeg -i input.mp4 -filter_complex "[0:v]setpts=2.0*PTS[v];[0:a]atempo=0.5[a]" -map "[v]" -map "[a]" slow.mp4
 ```
 
 ### Color Grading
 ```bash
-# Brilho, contraste, saturacao
+# Brightness, contrast, saturation
 ffmpeg -i input.mp4 -vf "eq=brightness=0.05:contrast=1.2:saturation=1.3" output.mp4
 
 # Cinematic (crush blacks, roll highlights)
@@ -196,12 +196,12 @@ ffmpeg -i input.mp4 -vf "curves=m='0/0.05 0.5/0.5 1/0.95'" output.mp4
 ffmpeg -i input.mp4 -vf "hue=s=0" output.mp4
 ```
 
-### Estabilizacao
+### Stabilization
 ```bash
-# Passo 1: Analisar
+# Step 1: Analyze
 ffmpeg -i shaky.mp4 -vf vidstabdetect -f null -
 
-# Passo 2: Aplicar
+# Step 2: Apply
 ffmpeg -i shaky.mp4 -vf vidstabtransform=smoothing=10:input=transforms.trf output.mp4
 ```
 
@@ -214,40 +214,40 @@ ffmpeg -i video.mp4 -i logo.png \
 
 ## Batch Processing
 
-### Converter todos os MOV para MP4
+### Convert all MOV to MP4
 ```bash
 for f in *.mov; do
   ffmpeg -i "$f" -c:v libx264 -c:a aac -preset fast "${f%.mov}.mp4"
 done
 ```
 
-### Gerar thumbnails de todos os videos
+### Generate thumbnails for all videos
 ```bash
 for f in *.mp4; do
   ffmpeg -i "$f" -ss 00:00:05 -vframes 1 "thumb_${f%.mp4}.jpg"
 done
 ```
 
-### Redimensionar todos para 1080p
+### Resize all to 1080p
 ```bash
 for f in *.mp4; do
   ffmpeg -i "$f" -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2" -c:a copy "1080p_$f"
 done
 ```
 
-## Workflow de Edicao
+## Editing Workflow
 
-1. **Analisar** — `ffprobe` no video de entrada
-2. **Planejar** — Listar operacoes necessarias na ordem
-3. **Encadear filtros** — Combinar operacoes em um unico comando quando possivel (evita re-encoding multiplo)
-4. **Executar** — Rodar o comando
-5. **Verificar** — `ffprobe` no output, confirmar qualidade
-6. **Otimizar** — Ajustar CRF, bitrate, resolucao se necessario
+1. **Analyze** — `ffprobe` on the input video
+2. **Plan** — List the required operations in order
+3. **Chain filters** — Combine operations in a single command when possible (avoids multiple re-encodings)
+4. **Execute** — Run the command
+5. **Verify** — `ffprobe` on the output, confirm quality
+6. **Optimize** — Adjust CRF, bitrate, resolution if needed
 
-## Dicas de Performance
+## Performance Tips
 
-- Use `-c copy` sempre que possivel (sem re-encoding = instantaneo)
-- Use `-preset ultrafast` para testes rapidos, `-preset slow` para output final
-- `-movflags +faststart` para videos web (carrega mais rapido)
-- Para batch, use GNU `parallel` para processar multiplos videos simultaneamente
-- Hardware acceleration: `-hwaccel auto` (usa GPU se disponivel)
+- Use `-c copy` whenever possible (no re-encoding = instant)
+- Use `-preset ultrafast` for quick tests, `-preset slow` for final output
+- `-movflags +faststart` for web videos (loads faster)
+- For batch processing, use GNU `parallel` to process multiple videos simultaneously
+- Hardware acceleration: `-hwaccel auto` (uses GPU if available)
