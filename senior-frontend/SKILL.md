@@ -1,6 +1,6 @@
 ---
-name: frontend-extreme
-description: "The ultimate frontend design and development skill. Creates production-ready, pixel-perfect web interfaces with Next.js + Tailwind + shadcn/ui. Combines design thinking, UX best practices, accessibility, animation, and real design system patterns inspired by the best sites on the web. Invoked explicitly via /frontend-extreme command, but also auto-triggers when the user asks to build frontend pages, components, landing pages, dashboards, SaaS interfaces, portfolios, or design systems. Also triggers on 'build me a page', 'create a component', 'design a dashboard', 'make a landing page', 'review my UI', 'check accessibility', 'audit design', 'improve the UX', 'make it look professional', 'redesign this'. Supersedes frontend-design and web-design-guidelines."
+name: senior-frontend
+description: "The ultimate frontend design and development skill. Creates production-ready, pixel-perfect web interfaces with Next.js + Tailwind + shadcn/ui. Combines design thinking, UX best practices, accessibility, animation, and real design system patterns inspired by the best sites on the web. Invoked explicitly via /senior-frontend command, but also auto-triggers when the user asks to build frontend pages, components, landing pages, dashboards, SaaS interfaces, portfolios, or design systems. Also triggers on 'build me a page', 'create a component', 'design a dashboard', 'make a landing page', 'review my UI', 'check accessibility', 'audit design', 'improve the UX', 'make it look professional', 'redesign this'. Supersedes frontend-design and web-design-guidelines."
 ---
 
 # UI/UX Pro Max — The Definitive Frontend Skill
