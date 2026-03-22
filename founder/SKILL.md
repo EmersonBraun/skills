@@ -1,6 +1,9 @@
 ---
 name: founder
 description: "Strategic consultant for founders and entrepreneurs. Use this skill WHENEVER the user mentions: startup, MVP, product launch, fundraising, pitch deck, product-market fit, go-to-market, startup metrics, growth hacking, SaaS pricing, idea validation, investment raising, business model, lean startup, bootstrap, scaling a business, churn, MRR, CAC, LTV, runway, unit economics, investor deck, accelerator, incubator, pivot, or any topic related to building and scaling a digital business. Also activates when the user asks for business advice, market analysis, monetization strategy, or wants to discuss the viability of an idea."
+metadata:
+  author: EmersonBraun
+  version: "1.0.0"
 ---
 
 # Founder — Strategic Consultant for Entrepreneurs

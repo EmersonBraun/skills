@@ -8,6 +8,9 @@ description: >
   to existing skills (PRD, Issues, Code Review) where available, filling in QA Planning,
   Development, Testing, and PR management. Trigger even if the user only mentions one phase —
   this skill decides what comes next and runs autonomously via Claude Code.
+metadata:
+  author: EmersonBraun
+  version: "1.0.0"
 ---
 
 # Dev Workflow Orchestrator

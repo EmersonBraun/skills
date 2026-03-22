@@ -1,6 +1,9 @@
 ---
 name: video-editor
 description: "Edits existing videos using ffmpeg and Python. Use ALWAYS when the user wants to edit a video, cut a video, join videos, add subtitles, add music, remove audio, resize a video, convert format, compress a video, extract audio, extract frames, add a watermark, make a timelapse, slow motion, speed up, reverse, add a transition, crop, rotate, adjust brightness/contrast, color grading, generate a GIF, generate a thumbnail, or any manipulation of an existing video file. Also activates when the user mentions: ffmpeg, moviepy, cutting a clip, joining clips, captioning a video, or processing a video."
+metadata:
+  author: EmersonBraun
+  version: "1.0.0"
 ---
 
 # Video Editor — Video Editing via Code

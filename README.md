@@ -1,6 +1,8 @@
 # Skills
 
-[Agent Skills](https://agentskills.io/) for founders, frontend engineering, dev workflow, QA, architecture, and video production.
+[![Validate Skills](https://github.com/EmersonBraun/skills/actions/workflows/validate-skills.yml/badge.svg)](https://github.com/EmersonBraun/skills/actions/workflows/validate-skills.yml)
+
+[Agent Skills](https://agentskills.io/) for founders, frontend engineering, dev workflow, QA, code review, architecture, and video production.
 
 Compatible with **Claude Code, Cursor, Copilot, VS Code, OpenCode, Gemini CLI, Codex, Roo Code, Kiro**, and [30+ other tools](https://agentskills.io/).
 
@@ -33,7 +35,7 @@ npx skills add EmersonBraun/skills/founder
 
 | Skill | Orchestrates | Description |
 |-------|-------------|-------------|
-| **[dev-workflow](./dev-workflow)** | `write-a-prd` → `prd-to-issues` → `senior-qa` → code review | End-to-end development lifecycle. PRD to merged PR, fully autonomous. |
+| **[dev-workflow](./dev-workflow)** | `write-a-prd` → `prd-to-issues` → `senior-qa` → `code-review` | End-to-end development lifecycle. PRD to merged PR, fully autonomous. |
 
 ### Building Blocks
 
@@ -41,6 +43,7 @@ Used by workflow skills or independently:
 
 | Skill | Description |
 |-------|-------------|
+| **[code-review](./code-review)** | Multi-agent PR review with confidence scoring. Checks bugs, CLAUDE.md compliance, git history, and previous PR comments. |
 | **[write-a-prd](./write-a-prd)** | Create PRDs through user interview, codebase exploration, and module design. Submit as GitHub issue. |
 | **[prd-to-issues](./prd-to-issues)** | Break PRDs into independently-grabbable GitHub issues using tracer-bullet vertical slices. |
 | **[improve-codebase-architecture](./improve-codebase-architecture)** | Find architectural improvement opportunities. Module-deepening refactors as GitHub issue RFCs. |
@@ -53,11 +56,16 @@ dev-workflow
 ├── write-a-prd
 ├── prd-to-issues
 ├── senior-qa
-└── code-review (external)
+└── code-review
 
 senior-frontend
 └── supersedes: web-design-guidelines
 ```
+
+## Also Available On
+
+- [SkillUse](https://github.com/skilluse/skilluse) — `skilluse install EmersonBraun/skills`
+- [ClawHub](https://www.clawhub.com) — Browse and install via registry
 
 ## Contributing
 

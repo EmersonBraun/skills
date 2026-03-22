@@ -1,0 +1,99 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate Agent Skills Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate all skills
+        run: |
+          errors=0
+          for dir in */; do
+            if [ ! -f "${dir}SKILL.md" ]; then
+              continue
+            fi
+
+            skill_name="${dir%/}"
+            echo "::group::Validating ${skill_name}"
+
+            frontmatter=$(sed -n '/^---$/,/^---$/p' "${dir}SKILL.md")
+
+            name=$(echo "$frontmatter" | grep "^name:" | head -1 | sed 's/name: *//' | tr -d '"' | tr -d "'")
+            if [ -z "$name" ]; then
+              echo "::error file=${dir}SKILL.md::Missing required 'name' field in frontmatter"
+              errors=$((errors + 1))
+            elif [ "$name" != "$skill_name" ]; then
+              echo "::error file=${dir}SKILL.md::name '${name}' does not match directory '${skill_name}'"
+              errors=$((errors + 1))
+            fi
+
+            if [ -n "$name" ]; then
+              if ! echo "$name" | grep -qE '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'; then
+                echo "::error file=${dir}SKILL.md::name '${name}' invalid format (lowercase alphanumeric + hyphens only)"
+                errors=$((errors + 1))
+              fi
+              if echo "$name" | grep -q '\-\-'; then
+                echo "::error file=${dir}SKILL.md::name '${name}' contains consecutive hyphens"
+                errors=$((errors + 1))
+              fi
+              if [ ${#name} -gt 64 ]; then
+                echo "::error file=${dir}SKILL.md::name exceeds 64 characters"
+                errors=$((errors + 1))
+              fi
+            fi
+
+            desc=$(echo "$frontmatter" | grep "^description:" | head -1)
+            if [ -z "$desc" ]; then
+              desc=$(echo "$frontmatter" | grep -A1 "^description:" | tail -1)
+            fi
+            if [ -z "$desc" ]; then
+              echo "::error file=${dir}SKILL.md::Missing required 'description' field"
+              errors=$((errors + 1))
+            fi
+
+            lines=$(wc -l < "${dir}SKILL.md")
+            if [ "$lines" -gt 500 ]; then
+              echo "::warning file=${dir}SKILL.md::${lines} lines (recommended < 500)"
+            fi
+
+            echo "  ${skill_name} — valid (${lines} lines)"
+            echo "::endgroup::"
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "::error::Validation failed with ${errors} error(s)"
+            exit 1
+          fi
+
+          echo ""
+          echo "All skills validated successfully!"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Skills Inventory" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Skill | Lines | References | Scripts |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|-------|------------|---------|" >> "$GITHUB_STEP_SUMMARY"
+          for dir in */; do
+            if [ ! -f "${dir}SKILL.md" ]; then
+              continue
+            fi
+            name="${dir%/}"
+            lines=$(wc -l < "${dir}SKILL.md")
+            refs="—"
+            scripts="—"
+            [ -d "${dir}references" ] && refs="yes"
+            [ -d "${dir}scripts" ] && scripts="yes"
+            echo "| ${name} | ${lines} | ${refs} | ${scripts} |" >> "$GITHUB_STEP_SUMMARY"
+          done

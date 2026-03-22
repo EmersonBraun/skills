@@ -1,6 +1,9 @@
 ---
 name: video-creator
 description: "Creates videos from scratch using ffmpeg, programming, and assets. Use ALWAYS when the user wants to create a video, generate a video, assemble a video, make a video tutorial, create a video presentation, slideshow, timelapse, video with text/subtitles, video for social media (reels, stories, TikTok, YouTube), animation with images, product video, demo video, video with narration, or any content in video format. Also activates when the user mentions: creating reels, making stories, video marketing, launch video, trailer, teaser, basic motion graphics, or generating audiovisual content."
+metadata:
+  author: EmersonBraun
+  version: "1.0.0"
 ---
 
 # Video Creator — Video Creation via Code
