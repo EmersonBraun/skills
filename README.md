@@ -2,7 +2,7 @@
 
 [![Validate Skills](https://github.com/EmersonBraun/skills/actions/workflows/validate-skills.yml/badge.svg)](https://github.com/EmersonBraun/skills/actions/workflows/validate-skills.yml)
 
-[Agent Skills](https://agentskills.io/) for founders, frontend engineering, game development, dev workflow, QA, code review, architecture, and video production.
+[Agent Skills](https://agentskills.io/) for founders, marketing, frontend engineering, game development, dev workflow, QA, code review, architecture, and video production.
 
 Compatible with **Claude Code, Cursor, Copilot, VS Code, OpenCode, Gemini CLI, Codex, Roo Code, Kiro**, and [30+ other tools](https://agentskills.io/).
 
@@ -31,6 +31,7 @@ npx skills add EmersonBraun/skills/founder
 | **[senior-qa](./senior-qa)** | Comprehensive QA and testing. Test suite generation, coverage analysis, E2E scaffolding with Playwright. |
 | **[video-creator](./video-creator)** | Create videos from scratch using ffmpeg and Python. Slideshows, reels, demos, tutorials, motion graphics, silence removal. |
 | **[video-editor](./video-editor)** | Edit existing videos with ffmpeg. Trim, concat, subtitles, overlay compositing, transcript-based editing, batch processing. |
+| **[marketing](./marketing)** | Full-stack marketing execution. Audits, copywriting, email sequences, social calendars, ad campaigns, funnel analysis, SEO, brand voice, launch playbooks. Complements `founder`. |
 | **[grill-me](./grill-me)** | Interview you relentlessly about a plan or design until reaching shared understanding. Stress-test your ideas. |
 
 ### Workflow Orchestrators
@@ -62,6 +63,8 @@ dev-workflow
 
 senior-frontend
 └── supersedes: web-design-guidelines
+
+founder ←→ marketing (strategy ↔ execution)
 
 remotion
 └── complements: video-creator, video-editor
