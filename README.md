@@ -128,8 +128,14 @@ senior-frontend + branding (identity → implementation)
 
 ## Also Available On
 
-- [SkillUse](https://github.com/skilluse/skilluse) — `skilluse install EmersonBraun/skills`
-- [ClawHub](https://www.clawhub.com) — Browse and install via registry
+| Registry | Install Command |
+|----------|----------------|
+| **Direct (GitHub)** | `npx skills add EmersonBraun/skills` |
+| [SkillUse](https://github.com/skilluse/skilluse) | `skilluse install EmersonBraun/skills` |
+| [ClawHub](https://clawhub.ai) | Search for `eb-*` skills |
+| [SkillDock.io](https://skilldock.io) | `skilldock skill install --slug eb-<skill-name>` |
+| [SkillsMP](https://skillsmp.com) | Browse and install via marketplace |
+| [Tech Leads Club](https://github.com/tech-leads-club/agent-skills) | Curated registry with security review |
 
 ## Contributing
 
