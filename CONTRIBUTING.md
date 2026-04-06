@@ -46,28 +46,21 @@ description: "Clear description of what it does and when to trigger. Include key
 
 ## Skill Organization
 
-Skills are organized into two categories:
+### By Category
 
-### Standalone Skills
-Skills that work independently:
-- `founder` — Startup strategy
-- `senior-frontend` — Frontend engineering
-- `senior-qa` — QA and testing
-- `video-creator` — Create videos
-- `video-editor` — Edit videos
-- `grill-me` — Stress-test plans
+| Category | Skills |
+|----------|--------|
+| **Ideation** | `idea-validation`, `brainstorm`, `grill-me` |
+| **Product** | `founder`, `write-a-prd`, `prd-to-issues` |
+| **Development** | `software-architect`, `senior-frontend`, `senior-backend`, `senior-qa`, `dev-workflow`, `code-review`, `improve-codebase-architecture` |
+| **Infrastructure** | `devops-deploy` |
+| **Go-to-Market** | `branding`, `landing-page`, `marketing`, `seo` |
+| **Operations** | `analytics`, `legal-compliance` |
+| **Content** | `video-creator`, `video-editor` |
 
-### Workflow Skills
-Skills that orchestrate other skills:
-- `dev-workflow` — Orchestrates: `write-a-prd` → `prd-to-issues` → `senior-qa` → code review
-- `senior-frontend` — Supersedes: `web-design-guidelines`
+### Workflow Orchestrator
 
-### Infrastructure Skills
-Skills used as building blocks by workflow skills:
-- `write-a-prd` — PRD creation
-- `prd-to-issues` — PRD to GitHub issues
-- `improve-codebase-architecture` — Architecture refactoring
-- `web-design-guidelines` — UI compliance review
+- `dev-workflow` — Orchestrates: `write-a-prd` → `prd-to-issues` → `software-architect` → `senior-frontend` + `senior-backend` → `senior-qa` → `code-review`
 
 ## Quality Guidelines
 
