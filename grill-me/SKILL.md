@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me".
+description: "Stress-test plans, designs, and ideas through relentless questioning. Use this skill when the user mentions: grill me, stress-test my plan, challenge my design, poke holes, devil's advocate, question my assumptions, find the flaws, or wants their ideas tested through rigorous interrogation. Different from brainstorm (which generates ideas) — this skill ATTACKS existing plans to find weaknesses."
 metadata:
   author: EmersonBraun
   version: "1.0.0"
