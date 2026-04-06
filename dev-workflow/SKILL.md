@@ -24,11 +24,12 @@ merged PR. Delegates to your existing skills where they exist; owns the phases i
 |-------|-------|
 | 1 — PRD | Invoke skill: `write-a-prd` |
 | 2 — Issues from PRD | Invoke skill: `prd-to-issues` |
-| 3 — QA Planning | This skill |
-| 4 — Development | Claude Code autonomous |
-| 5 — Automated Testing | This skill (npm test + Playwright) |
-| 6 — Code Review | Invoke skill: `code-review:code-review` |
-| 7 — PR + Close + Advance | This skill |
+| 3 — Architecture | Invoke skill: `software-architect` |
+| 4 — QA Planning | This skill |
+| 5 — Development | Invoke skills: `senior-frontend`, `senior-backend` |
+| 6 — Automated Testing | This skill (npm test + Playwright) |
+| 7 — Code Review | Invoke skill: `code-review:code-review` |
+| 8 — PR + Close + Advance | This skill |
 
 ---
 
@@ -39,11 +40,12 @@ IDEA
   |-- [Phase 1] invoke skill: write-a-prd
        |-- [Phase 2] invoke skill: prd-to-issues -> ordered issues
             |-- For each issue:
-                 |-- [Phase 3] QA Planning (before any code)
-                 |-- [Phase 4] Claude Code develops autonomously
-                 |-- [Phase 5] npm test + Playwright + coverage check
-                 |-- [Phase 6] invoke skill: code-review:code-review
-                 |-- [Phase 7] PR created -> issue closed -> next issue
+                 |-- [Phase 3] invoke skill: software-architect
+                 |-- [Phase 4] QA Planning (before any code)
+                 |-- [Phase 5] invoke skills: senior-frontend + senior-backend
+                 |-- [Phase 6] npm test + Playwright + coverage check
+                 |-- [Phase 7] invoke skill: code-review:code-review
+                 |-- [Phase 8] PR created -> issue closed -> next issue
 ```
 
 ---
@@ -56,7 +58,7 @@ At the start of every session, output this state block and ask the user to confi
 DEV WORKFLOW STATE
  Feature PRD   : #[number] - [title]
  Current issue : #[number] - [title]
- Current phase : [1-7] - [phase name]
+ Current phase : [1-8] - [phase name]
  Remaining     : #X, #Y, #Z
 ```
 
@@ -110,9 +112,23 @@ Wait for all issues to be created and confirmed by the user before advancing.
 
 ---
 
-## Phase 3 — QA Planning
+## Phase 3 — Architecture
 
-**Trigger:** About to start development on an issue.
+**Owner: software-architect skill.**
+
+Invoke skill `software-architect` to design the system structure for this issue/feature.
+For the first issue in a new feature, this produces the full architecture. For subsequent
+issues, review and update the existing architecture if the new issue changes boundaries.
+
+**Skip this phase** for small issues that don't affect system structure (bug fixes, copy changes, minor UI tweaks).
+
+**Exit condition:** Architecture document exists and is appropriate for the issue scope.
+
+---
+
+## Phase 4 — QA Planning
+
+**Trigger:** Architecture exists (or skipped) for this issue.
 **Rule: This runs BEFORE any code is written.**
 
 Generate and post as a GitHub comment on the issue:
@@ -144,9 +160,15 @@ Generate and post as a GitHub comment on the issue:
 
 ---
 
-## Phase 4 — Autonomous Development
+## Phase 5 — Development
+
+
 
 **Trigger:** QA plan exists on the issue.
+
+Invoke skills `senior-frontend` and/or `senior-backend` as appropriate for the implementation.
+Use `senior-frontend` for UI components, pages, and client-side logic.
+Use `senior-backend` for API routes, database schemas, and server-side logic.
 
 Claude Code implements autonomously following these rules:
 
@@ -160,7 +182,7 @@ Claude Code implements autonomously following these rules:
 
 ---
 
-## Phase 5 — Automated Testing
+## Phase 6 — Automated Testing
 
 **Trigger:** Implementation complete.
 
@@ -172,7 +194,7 @@ Always use npm to run tests, regardless of what package manager the project uses
 npm test -- --coverage
 ```
 
-Gate: **coverage >= 80%**. If below, return to Phase 4 with coverage report.
+Gate: **coverage >= 80%**. If below, return to Phase 5 with coverage report.
 
 ### 5b — E2E via Playwright Agents (three-agent flow)
 1. **Planner** — converts QA plan E2E scenarios into navigation flows
@@ -192,25 +214,25 @@ Run smoke tests on every feature listed in "Regression Scope" from the QA plan.
 ```
 
 **Exit condition:** All green, coverage >= 80%, zero regressions.
-On failure, return to Phase 4 with the report attached.
+On failure, return to Phase 5 with the report attached.
 
 ---
 
-## Phase 6 — Code Review
+## Phase 7 — Code Review
 
 **Owner: your existing Code Review skill.**
 
 Invoke skill `code-review:code-review` directly. Pass it the branch/diff context.
 Wait for verdict before advancing.
 
-- Approved -> advance to Phase 7
-- Changes requested -> return to Phase 4 with review comments
+- Approved -> advance to Phase 8
+- Changes requested -> return to Phase 5 with review comments
 
 **Exit condition:** Code Review skill returns Approved.
 
 ---
 
-## Phase 7 — PR + Close + Advance
+## Phase 8 — PR + Close + Advance
 
 **Trigger:** Code review approved.
 
@@ -236,7 +258,7 @@ Part of #[parent-PRD-number]
 - Check off the corresponding item on the parent PRD issue
 
 ### 7c — Advance
-- Issues remaining -> update state block -> return to **Phase 3** for next issue
+- Issues remaining -> update state block -> return to **Phase 3** (or **Phase 4** if architecture unchanged) for next issue
 - All issues done -> close parent PRD issue with summary -> **workflow complete**
 
 **Exit condition:** PR merged, issue closed, next phase identified.
@@ -252,7 +274,7 @@ for structured templates for specs, plans, tasks, and checklists.
 |----------|---------|-------------|
 | Feature Specification | Full spec with scenarios, FRs, entities, success criteria | Phase 1 PRD creation |
 | Implementation Plan | Phased plan with research, gates, MVP cut line | Phase 2 issue breakdown |
-| Task Breakdown | T-NNN task list with parallel markers and user story links | Phase 2 / Phase 3 prep |
+| Task Breakdown | T-NNN task list with parallel markers and user story links | Phase 2 / Phase 4 prep |
 | Requirements Checklist | CHK-NNN quality gates for spec approval | Before Phase 2 begins |
 | Constitution (optional) | Project-level architectural principles | Phase 0 for greenfield projects |
 
@@ -262,11 +284,11 @@ for structured templates for specs, plans, tasks, and checklists.
 
 | Gate | Requirement | On failure |
 |------|------------|-----------|
-| QA Plan exists | Before Phase 4 starts | Block — do not proceed |
-| Unit coverage | >= 80% | Return to Phase 4 |
-| E2E tests | All passing | Return to Phase 4 |
-| Regressions | Zero detected | Return to Phase 4 |
-| Code Review | Approved | Return to Phase 4 |
+| QA Plan exists | Before Phase 5 starts | Block — do not proceed |
+| Unit coverage | >= 80% | Return to Phase 5 |
+| E2E tests | All passing | Return to Phase 5 |
+| Regressions | Zero detected | Return to Phase 5 |
+| Code Review | Approved | Return to Phase 5 |
 
 **Never skip a gate.** If the user requests skipping, state the risk clearly
 and require explicit confirmation before proceeding.
